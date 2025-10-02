@@ -4,16 +4,27 @@ const User = require('../models/User');
 
 router.post('/', async (req, res) => {
   const { idNumber } = req.body;
-  if (!idNumber) return res.status(400).json({ error: 'ID number is required' });
+  if (!idNumber) {
+    return res.status(400).json({ error: 'ID number is required' });
+  }
 
   try {
-    const student = await User.findOne({ idNumber: Number(idNumber), role: 'student' });
-    if (!student) return res.status(404).json({ error: 'ID not found' });
+    // hanap student gamit lean() para mabilis
+    const student = await User.findOne(
+      { idNumber: idNumber, role: 'student' }
+    ).select('-password -email -__v').lean();
 
-    const { password, email, ...studentInfo } = student._doc;
-    res.json({ message: 'Student found', student: studentInfo });
+    if (!student) {
+      return res.status(404).json({ error: 'ID not found' });
+    }
+
+    res.json({
+      message: 'Student found',
+      student,
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Lookup error:', err);
+    res.status(500).json({ error: 'Server error, please try again' });
   }
 });
 
