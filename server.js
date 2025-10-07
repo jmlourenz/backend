@@ -29,6 +29,11 @@ app.use('/api/register/photo', realtimePhotoRoute);
 app.use('/api/register/qrcode', qrcodeRoute);
 app.use('/api/register/credentials', credentialsRoute);
 
+// ✅ Add this health check route (para di “Cannot GET /”)
+app.get('/', (req, res) => {
+  res.send('🚀 Backend API is running...');
+});
+
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

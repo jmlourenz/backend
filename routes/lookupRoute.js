@@ -3,15 +3,17 @@ const router = express.Router();
 const User = require('../models/User');
 
 router.post('/', async (req, res) => {
-  const { idNumber } = req.body;
+  let { idNumber } = req.body;
   if (!idNumber) {
     return res.status(400).json({ error: 'ID number is required' });
   }
 
   try {
-    // hanap student gamit lean() para mabilis
+    // siguraduhin na number ang hinahanap
+    idNumber = Number(idNumber);
+
     const student = await User.findOne(
-      { idNumber: idNumber, role: 'student' }
+      { idNumber, role: 'student' }
     ).select('-password -email -__v').lean();
 
     if (!student) {
